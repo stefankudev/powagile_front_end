@@ -8,6 +8,7 @@ export default function Timer() {
     const timer = setTimeout(() => setCounter(counter - 1), 1000);
   }, [counter]);
   console.log(counter);
+
   return (
     <CountdownCircleTimer
       isPlaying
