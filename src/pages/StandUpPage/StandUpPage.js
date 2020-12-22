@@ -7,6 +7,7 @@ import { DialogTitle } from "@material-ui/core";
 import TextField from "@material-ui/core/TextField";
 import Paper from "@material-ui/core/Paper";
 import Button from "@material-ui/core/Button";
+import Timer from "../../components/Timer/Timer";
 
 // CSS
 import "./StandUpPage.css";
@@ -197,6 +198,7 @@ export default function StandUpPage() {
           </div>
         ) : null}
       </div>
+      <Timer />
     </div>
   );
 }
