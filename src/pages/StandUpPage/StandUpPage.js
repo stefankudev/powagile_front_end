@@ -12,6 +12,7 @@ import EditIcon from "@material-ui/icons/Edit";
 
 // CSS
 import "./StandUpPage.css";
+import Timer from "../../components/Timer/Timer";
 
 export default function StandUpPage() {
   const [minutesPerParticipant, setMinutesPerParticipant] = useState(2);
@@ -143,6 +144,7 @@ export default function StandUpPage() {
           </center>
         ) : null}
       </div>
+      <Timer />
     </div>
   );
 }
