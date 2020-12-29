@@ -6,7 +6,7 @@ import "./FourLsRetro.css";
 
 //Customer Component
 import Card from "../../components/CardRetro";
-import CheckboxList from "./instructions";
+import SimplePopover from "./instructions2";
 import Timer from "../../components/Timer/Timer";
 
 function FourLsRetro() {
@@ -23,7 +23,7 @@ function FourLsRetro() {
   const [Cards, setCards] = useState([]);
   const [likes, setLikes] = useState(0);
   const [dislikes, setDislike] = useState(0);
-
+  const [newCardUser, setNewCardUser] = useState("");
   function newUserInput(e, idx) {
     let newCards = [...Cards];
     newCards[idx].input = e.target.value;
@@ -114,6 +114,9 @@ function FourLsRetro() {
     setRetroActive(true);
     setInstructions(false);
   }
+  function setNewCard(e) {
+    setNewCardUser(e.target.value);
+  }
   return (
     <div className="Retro">
       <div>
@@ -123,7 +126,7 @@ function FourLsRetro() {
         <button onClick={startRetro}>Play Retro</button>
         {instructions ? (
           <div>
-            <CheckboxList />
+            <SimplePopover />
           </div>
         ) : null}
       </div>
@@ -265,6 +268,44 @@ function FourLsRetro() {
                     return (
                       <Card
                         key={"Action Items" + idx}
+                        idx={idx}
+                        cardId={card.id}
+                        value={card.input}
+                        userInput={newUserInput}
+                        validateInput={validateInput}
+                        MoveLeft={moveLeft}
+                        Delete={deleteFn}
+                        MoveRight={moveRight}
+                        likesCount={card.likes}
+                        dislikesCount={card.dislikes}
+                        handleLikes={handleLikes}
+                        handleDislikes={handleDislikes}
+                        addClass={addClass}
+                        color={"actionItems"}
+                      />
+                    );
+                  } else {
+                    return null;
+                  }
+                })}
+              </div>
+              <div className={addClass === 1 ? "row" : "col"}>
+                <div className={(addClass === 1 ? " Rotate-1" : "").toString()}>
+                  <input placeholder="Name of your Card"></input>
+                  <h4>{setNewCard}</h4>
+                  <button
+                    type="button"
+                    className="addButton"
+                    onClick={() => createCard("newCard", "")}
+                  >
+                    +
+                  </button>
+                </div>
+                {Cards.map((card, idx) => {
+                  if (card.type === "newCard") {
+                    return (
+                      <Card
+                        key={"newCard" + idx}
                         idx={idx}
                         cardId={card.id}
                         value={card.input}

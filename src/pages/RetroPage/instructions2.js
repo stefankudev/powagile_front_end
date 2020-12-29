@@ -1,24 +1,14 @@
-import React, { useState } from "react";
+import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
-import ListItemText from "@material-ui/core/ListItemText";
-import Checkbox from "@material-ui/core/Checkbox";
-import IconButton from "@material-ui/core/IconButton";
-import CommentIcon from "@material-ui/icons/Comment";
+import Popover from "@material-ui/core/Popover";
+import Typography from "@material-ui/core/Typography";
+import Button from "@material-ui/core/Button";
 
 const useStyles = makeStyles((theme) => ({
-  root: {
-    width: "100%",
-    maxWidth: 360,
-    backgroundColor: theme.palette.background.paper,
+  typography: {
+    padding: theme.spacing(2),
   },
 }));
-//checkbox, for the moment is not doing anything, only visual aspect;
-//changed array of listItems to an array of objject so we can use the proprety of comment;
-//!!!need to find a way to display it in <ListItemSecondaryAction> tag.
 const listItems = [
   {
     title: "1. Prep - 5 min",
@@ -57,63 +47,48 @@ const listItems = [
   },
 ];
 
-export default function CheckboxList() {
+export default function SimplePopover() {
   const classes = useStyles();
-  const [checked, setChecked] = useState([0]);
-  // const [commentVisible, setCommentVisible] = useState(false);
+  const [anchorEl, setAnchorEl] = React.useState(null);
 
-  const handleToggle = (listItems) => () => {
-    const currentIndex = checked.indexOf(listItems);
-    const newChecked = [...checked];
-
-    if (currentIndex === -1) {
-      newChecked.push(listItems);
-    } else {
-      newChecked.splice(currentIndex, 1);
-    }
-
-    setChecked(newChecked);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
   };
-  // function displayCom() {
-  //   alert(listItems.comment);
-  //   setCommentVisible(true);
-  // }
-  return (
-    <List className={classes.root}>
-      {listItems.map((value) => {
-        const labelId = `checkbox-list-label-${value}`;
 
-        return (
-          <ListItem
-            key={value.title}
-            role={undefined}
-            dense
-            button
-            onClick={handleToggle(value)}
-          >
-            <ListItemIcon>
-              <Checkbox
-                edge="start"
-                checked={checked.indexOf(value) !== -1}
-                tabIndex={-1}
-                disableRipple
-                inputProps={{ "aria-labelledby": labelId }}
-              />
-            </ListItemIcon>
-            <ListItemText id={labelId} primary={`${value.title}`} />
-            <ListItemSecondaryAction>
-              <IconButton
-                edge="end"
-                aria-label="comments"
-                primary={`${value.comment}`}
-                // onClick={displayCom}
-              >
-                <CommentIcon />
-              </IconButton>
-            </ListItemSecondaryAction>
-          </ListItem>
-        );
-      })}
-    </List>
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
+  const id = open ? "simple-popover" : undefined;
+
+  return (
+    <div>
+      {/* {listItems.map((value) => { */}
+      <Button
+        aria-describedby={id}
+        variant="contained"
+        color="primary"
+        onClick={handleClick}
+      >
+        value.title
+      </Button>
+      <Popover
+        id={id}
+        open={open}
+        anchorEl={anchorEl}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "center",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "center",
+        }}
+      >
+        <Typography className={classes.typography}>value.comment</Typography>
+      </Popover>
+    </div>
   );
 }
