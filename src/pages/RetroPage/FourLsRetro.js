@@ -115,7 +115,8 @@ function FourLsRetro() {
     setInstructions(false);
   }
   function setNewCard(e) {
-    setNewCardUser(e.target.value);
+    const newCardName = e.target.value;
+    setNewCardUser(newCardName);
   }
   return (
     <div className="Retro">
@@ -291,8 +292,11 @@ function FourLsRetro() {
               </div>
               <div className={addClass === 1 ? "row" : "col"}>
                 <div className={(addClass === 1 ? " Rotate-1" : "").toString()}>
-                  <input placeholder="Name of your Card"></input>
-                  <h4>{setNewCard}</h4>
+                  <input
+                    placeholder="Name of your Card"
+                    onChange={setNewCardUser}
+                  ></input>
+                  <h4>{newCardUser}</h4>
                   <button
                     type="button"
                     className="addButton"
