@@ -5,6 +5,7 @@ import StandUpPage from "./pages/StandUpPage/StandUpPage";
 import HomePage from "./pages/HomePage/HomePage";
 import RetroPage from "./pages/RetroPage/RetroPage";
 import UserPage from "./pages/UserPage/UserPage";
+import ChatPage from "./pages/ChatPage/ChatPage"
 
 // React
 import React from "react";
@@ -14,6 +15,8 @@ import HorizontalNav4 from "./components/horizontal-navs/HorizontalNav4";
 
 // Router
 import { Route, Switch } from "react-router-dom";
+
+
 
 function App() {
   return (
@@ -36,6 +39,7 @@ function App() {
           <Route path="/rituals/retro" component={RetroPage}></Route>
           <Route path="/rituals/standup" component={StandUpPage}></Route>
           <Route path="/user" component={UserPage}></Route>
+          <Route path="/chat" component={ChatPage}></Route>
           <Route path="/" component={HomePage}></Route>
         </Switch>
       </main>
