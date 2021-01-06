@@ -20,30 +20,49 @@ export default function StandUpPage() {
   const [participantToAdd, setParticipantToAdd] = useState("");
 
   /*🔴🔴🔴🔴🔴*/
-  const dummyMeeting = {
-    type: "standup",
-    meetingParticipants: [
-      { name: "Daniela", hasHadTurn: false, timeLeft: 60 },
-      { name: "Stefan", hasHadTurn: false, timeLeft: 60 },
-      { name: "Tommy", hasHadTurn: false, timeLeft: 60 },
-      { name: "Kawalpreet", hasHadTurn: false, timeLeft: 60 },
-      { name: "Jon", hasHadTurn: false, timeLeft: 60 },
-    ],
+  // const dummyMeeting = {
+  //   type: "standup",
+  //   meetingParticipants: [
+  //     { name: "Daniela", hasHadTurn: false, timeLeft: 60 },
+  //     { name: "Stefan", hasHadTurn: false, timeLeft: 60 },
+  //     { name: "Tommy", hasHadTurn: false, timeLeft: 60 },
+  //     { name: "Kawalpreet", hasHadTurn: false, timeLeft: 60 },
+  //     { name: "Jon", hasHadTurn: false, timeLeft: 60 },
+  //   ],
+  //   meetingStartTime: null,
+  //   meetingEndTime: null,
+  // };
+
+  const properMeeting = {
+    type: "StandUp",
+    meetingParticipants: [],
     meetingStartTime: null,
     meetingEndTime: null,
   };
 
-  // const properMeeting = {
-  //   meetingParticipants: [],
-  //   meetingStartTime: null,
-  //   meetingEndTime: null,
-  // };
   /*🔴🔴🔴🔴🔴*/
 
-  const [meeting, setMeeting] = useState({ ...dummyMeeting });
+  const [meeting, setMeeting] = useState({ ...properMeeting });
 
   /*Steps*/
   const [totalMeetingTime, setTotalMeetingTime] = useState(0);
+  // const [deleteId, setDeleteId] = useState(0);
+
+  // function handleDelete(userId) {
+  //   setDeleteId(userId);
+  // }
+
+  // useEffect(() => {
+  //   async function deleteFromDB() {
+  //     const requestOptions = {
+  //       method: "DELETE",
+  //     };
+  //     console.log(requestOptions);
+  //     fetch(`http://localhost:8080/meeting/:${deleteId}`, requestOptions);
+  //     setDeleteId(null);
+  //   }
+  //   deleteId && deleteFromDB();
+  // }, [deleteId]);
 
   function deleteParticipant(i) {
     if (i === undefined) {
@@ -69,7 +88,7 @@ export default function StandUpPage() {
     calculateMeetingTime();
   });
 
-  function addParticipant(event) {
+  async function addParticipant(event) {
     event.preventDefault();
     if (participantToAdd === "") {
       return;
@@ -83,6 +102,13 @@ export default function StandUpPage() {
     });
     setParticipantToAdd("");
     setMeeting(newState);
+    const response = await fetch("http://localhost:8080/meeting", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(newState),
+    });
+    console.log(newState);
+    console.log(response);
   }
 
   function startMeeting() {
@@ -120,6 +146,7 @@ export default function StandUpPage() {
             totalMeetingTime,
             setStandUpStep,
             startMeeting,
+            setMeeting,
           }}
         />
       ) : null}

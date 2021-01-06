@@ -12,6 +12,9 @@ import "./02_Setup.css";
 // Custom Componenets
 import ParticipantCard from "../../../components/MeetingParticipants/ParticipantCard/ParticipantCard";
 
+// Auth0
+import { useAuth0 } from "@auth0/auth0-react";
+
 export default function SetupPage({ props }) {
   const {
     minutesPerParticipant,
@@ -26,7 +29,30 @@ export default function SetupPage({ props }) {
     totalMeetingTime,
     setStandUpStep,
     startMeeting,
+    setMeeting,
   } = props;
+
+  const { user, isAuthenticated } = useAuth0();
+
+  async function getParticipants() {
+    if (isAuthenticated) {
+      const res = await fetch("http://localhost:8080/meeting");
+      const data = await res.json();
+
+      const fetchedParticipants = [];
+      data[0].meetingParticipants.forEach((participant) =>
+        fetchedParticipants.push({
+          name: participant.name,
+          hasHadTurn: participant.hasHadTurn,
+          timeLeft: participant.timeLeft,
+          timesPaused: participant.timeLeft,
+        })
+      );
+      setMeeting({ ...meeting, meetingParticipants: fetchedParticipants });
+
+      console.log(data);
+    }
+  }
 
   return (
     //TODO: Inline styles here should be moved to 02_Setup.CSS
@@ -116,10 +142,18 @@ export default function SetupPage({ props }) {
             >
               Add
             </Button>
-
+            <Button
+              variant="contained"
+              color="primary"
+              size="large"
+              onClick={getParticipants}
+            >
+              Get participants
+            </Button>
             {meeting.meetingParticipants
               ? meeting.meetingParticipants.map((obj, i) => (
                   <ParticipantCard
+                    key={i}
                     index={i}
                     name={obj.name}
                     deleteParticipant={deleteParticipant}
