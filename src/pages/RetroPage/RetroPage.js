@@ -1,9 +1,18 @@
 // React
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 // Material UI
 import Grid from "@material-ui/core/Grid";
 import Button from "@material-ui/core/Button";
+import Paper from "@material-ui/core/Paper";
+import List from "@material-ui/core/List";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemText from "@material-ui/core/ListItemText";
+import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
+import IconButton from "@material-ui/core/IconButton";
+
+// Icons
+import CheckCircleIcon from "@material-ui/icons/CheckCircle";
 
 // Retro Types Icons
 import Looks4Icon from "@material-ui/icons/Looks4";
@@ -19,8 +28,11 @@ import ProductTitle from "../../components/ProductTitle/ProductTitle";
 import TimerPartyParrotHorizontal from "../../components/TimerPartyParrot/TimerPartyParrotHorizontal";
 import RetroColumn from "./03_Retro/RetroColumn/RetroColumn";
 
-// uuid
-import { v4 as uuidv4 } from "uuid";
+// nanoid (Used for short unique IDs for Socket Rooms)
+import { nanoid } from "nanoid";
+
+// socket.io
+import io from "socket.io-client";
 
 // CSS
 import "./RetroPage.css";
@@ -29,12 +41,14 @@ function Retro() {
   const [meeting, setMeeting] = useState({
     type: "retro",
     subtype: undefined,
-    columns: ["Test1", "Test2", "Test3", "Test4", "Test5", "Test6"],
+    columns: [],
     cards: [],
     meetingStarted: false,
     meetingStartTime: null,
     meetingEndTime: null,
   });
+  const [meetingParticipants, setMeetingParticipants] = useState([]);
+  const [socket, setSocket] = useState(false);
 
   const retroColumns = {
     fourLs: ["Liked", "Learned", "Lacked", "Longed For"],
@@ -60,7 +74,7 @@ function Retro() {
   function addCard(colIndex) {
     const newState = { ...meeting };
     newState.cards.push({
-      id: uuidv4(),
+      id: nanoid(),
       columnIndex: colIndex,
       content: "",
       thumbsUp: 0,
@@ -127,6 +141,50 @@ function Retro() {
       cards: newCards,
     });
   }
+
+  function sendMeetingToSocket() {
+    fetch("http://localhost:8080/sockets/", {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      method: "POST",
+      connection: "keep-alive",
+      body: JSON.stringify({ meeting }),
+    });
+  }
+
+  // FIXME: Websocket connection, much replace with production back end URL
+  useEffect(() => {
+    if (!socket) {
+      const connection = io.connect("localhost:8080/", {
+        query: {
+          // FIXME: Get unique id from state (for non-facilitators)
+          roomID: `Retro_Room_${nanoid()}`,
+          username: `Stefan_Socket_${nanoid()}`,
+        },
+      });
+      setSocket(connection);
+    }
+
+    if (socket) {
+      socket.on("participants", (participant) =>
+        setMeetingParticipants([...meetingParticipants, participant])
+      );
+
+      socket.on("meeting", (newMeeting) => {
+        if ({ ...meeting } != { ...newMeeting }) {
+          setMeeting(newMeeting);
+        }
+      });
+    }
+
+    // sendMeetingToSocket();
+  }, [meetingParticipants, socket]);
+
+  // FIXME: Websocket connection, much replace with production back end URL
+  useEffect(() => {
+    sendMeetingToSocket();
+  }, [meeting, sendMeetingToSocket]);
 
   return (
     <div className="Retro">
@@ -199,12 +257,35 @@ function Retro() {
         </Button>
       </div>
 
-      <TimerPartyParrotHorizontal
-        props={{
-          totalTime: 600,
-          timeLeft: 600,
-        }}
-      />
+      <Grid container spacing={2}>
+        <Grid item xs={4}>
+          <Paper className="participantsTracker" elevation={2}>
+            <h3>Connected participants</h3>
+            <List dense={false}>
+              {meetingParticipants.map((el) => (
+                <ListItem>
+                  <ListItemText primary={el.name} />
+                  <ListItemSecondaryAction>
+                    {el.isConnected ? (
+                      <IconButton edge="end" aria-label="completed">
+                        <CheckCircleIcon color="primary" />
+                      </IconButton>
+                    ) : null}
+                  </ListItemSecondaryAction>
+                </ListItem>
+              ))}
+            </List>
+          </Paper>
+        </Grid>
+        <Grid item xs={8}>
+          <TimerPartyParrotHorizontal
+            props={{
+              totalTime: 600,
+              timeLeft: 600,
+            }}
+          />
+        </Grid>
+      </Grid>
 
       <div>
         <Grid
